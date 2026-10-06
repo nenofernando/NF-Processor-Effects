@@ -56,7 +56,8 @@ juce_add_plugin(NFProcessorEffects
  AAX_CATEGORY AAX_ePlugInCategory_Reverb)
 juce_generate_juce_header(NFProcessorEffects)
 
-juce_add_binary_data(NFPEAssets HEADER_NAME NFPEBinaryData.h NAMESPACE NFPEBinaryData SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Assets/logo_nf_audio_tools_official.png")
+juce_add_binary_data(NFPEAssets HEADER_NAME NFPEBinaryData.h NAMESPACE NFPEBinaryData SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Assets/logo_nf_audio_tools_official.png"
+ "${CMAKE_CURRENT_SOURCE_DIR}/Assets/Manuals/NF_ProcessorEffects_Manual_Portugues.pdf" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/Manuals/NF_ProcessorEffects_Manual_English.pdf")
 target_sources(NFProcessorEffects PRIVATE
  Source/PluginProcessor.cpp Source/PluginProcessor.h Source/PluginEditor.cpp Source/PluginEditor.h
  Source/DSP/Common.h Source/DSP/Catalog.h Source/DSP/Reverbs.h Source/DSP/Delays.h Source/DSP/Modulation.h Source/DSP/Dynamics.h

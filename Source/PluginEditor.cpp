@@ -597,11 +597,29 @@ void NFPEAudioProcessorEditor::paint(juce::Graphics& g)
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// The manuals ship inside the plug-in: they are written once to a per-user folder (rewritten if the size differs after an update) and opened in the default PDF viewer.
+static void openManual(const char* data, int size, const juce::String& filename)
+{
+    auto dir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("NF Audio Tools").getChildFile("NF Processor Effects").getChildFile("Manuals");
+    dir.createDirectory();
+    auto file = dir.getChildFile(filename);
+    if (!file.existsAsFile() || file.getSize() != (juce::int64) size)
+    {
+        juce::TemporaryFile temp(file);
+        if (temp.getFile().replaceWithData(data, (size_t) size)) temp.overwriteTargetFileWithTemporary();
+    }
+    if (file.existsAsFile()) file.startAsProcess();
+}
+
 void NFPEAudioProcessorEditor::showMainMenu()
 {
     juce::PopupMenu m;
     auto choice = [&](int id, const juce::String& label, const juce::String& param, int value)
     { m.addItem(id, label, true, juce::roundToInt(processor.getParam(param)) == value); };
+    m.addSectionHeader("MANUALS");
+    m.addItem(10, "Manual - Portugues");
+    m.addItem(11, "Manual - English");
+    m.addSeparator();
     m.addSectionHeader("UTILITY");
     choice(1, "Output: Stereo", "outMode", 0); choice(2, "Output: Mono", "outMode", 1);
     choice(3, "Bypass: pass dry signal", "bypassMode", 0); choice(4, "Bypass: mute", "bypassMode", 1);
@@ -626,6 +644,8 @@ void NFPEAudioProcessorEditor::showMainMenu()
             case 5: pr.setParam("bank", 0); break;           case 6: pr.setParam("bank", 1); break;
             case 7: pr.setParam("hostSync", pr.getParam("hostSync") >= 0.5f ? 0.0f : 1.0f); break;
             case 8: pr.setParam("autoLoad", pr.getParam("autoLoad") >= 0.5f ? 0.0f : 1.0f); break;
+            case 10: openManual(NFPEBinaryData::NF_ProcessorEffects_Manual_Portugues_pdf, NFPEBinaryData::NF_ProcessorEffects_Manual_Portugues_pdfSize, "NF_ProcessorEffects_Manual_Portugues_V" JucePlugin_VersionString ".pdf"); break;
+            case 11: openManual(NFPEBinaryData::NF_ProcessorEffects_Manual_English_pdf, NFPEBinaryData::NF_ProcessorEffects_Manual_English_pdfSize, "NF_ProcessorEffects_Manual_English_V" JucePlugin_VersionString ".pdf"); break;
             case 100: safe->showAbout(); break;
             default: if (r >= 20 && r < 26) pr.apvts.state.setProperty("auditionMode", r - 20, nullptr); break;
         }
