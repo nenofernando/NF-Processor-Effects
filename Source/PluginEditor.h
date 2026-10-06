@@ -139,6 +139,7 @@ private:
     void onAuditionPressed();
     void tapTempo(int p);
     void showMainMenu();
+    void checkForUpdates();
     void showProgramMenu();
     void stepPreset(int direction);
     void showAbout();

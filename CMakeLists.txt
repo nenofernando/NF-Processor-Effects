@@ -6,8 +6,9 @@ project(NFProcessorEffects VERSION 1.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(NFPE_FETCH_JUCE "Fetch JUCE when not installed" ON)
-# Owner's rule: new plug-ins get the NF License System at the END, with Paulo. OFF while developing.
-option(NFPE_LICENSE "Enforce the NF License System (mute + activation overlay)" OFF)
+# The NF License System (mute + activation overlay) is ON by default so every release build, Windows and the
+# macOS DMG, ships locked. Pass -DNFPE_LICENSE=OFF only for local development.
+option(NFPE_LICENSE "Enforce the NF License System (mute + activation overlay)" ON)
 option(NFPE_ENABLE_AAX "Build AAX (licensed SDK required)" OFF)
 if(WIN32)
  set(_nfpe_home "$ENV{USERPROFILE}")
@@ -86,3 +87,9 @@ if(NFPE_BUILD_SNAPSHOT)
  target_compile_definitions(NFPESnapshot PRIVATE JucePlugin_Name="NF Processor Effects" JucePlugin_VersionString="1.0.0" JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_STANDALONE_APPLICATION=1 JucePlugin_Build_Standalone=0 JUCE_MODAL_LOOPS_PERMITTED=1 NF_LICENSE_TESTS=1)
  target_link_libraries(NFPESnapshot PRIVATE NFPEAssets juce::juce_audio_utils juce::juce_dsp juce::juce_cryptography juce::juce_gui_extra juce::juce_recommended_config_flags)
 endif()
+
+# "Check for updates" regression tests (version comparison, download-URL allow-list). No network.
+add_executable(NFPEUpdateTests Tests/UpdateCheckTests.cpp)
+target_compile_definitions(NFPEUpdateTests PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_STANDALONE_APPLICATION=1)
+target_link_libraries(NFPEUpdateTests PRIVATE juce::juce_core juce::juce_events juce::juce_recommended_config_flags)
+add_test(NAME NFPEUpdateTests COMMAND NFPEUpdateTests)

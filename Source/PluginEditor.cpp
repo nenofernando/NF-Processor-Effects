@@ -1,5 +1,6 @@
 #include "PluginEditor.h"
 #include "NFPEBinaryData.h"
+#include "License/NFUpdateCheck.h"
 #ifndef JucePlugin_VersionString
  #define JucePlugin_VersionString "0.0.0-test"
 #endif
@@ -631,6 +632,7 @@ void NFPEAudioProcessorEditor::showMainMenu()
     const char* names[6] = { "All samples in turn", "Drum stick click", "Snare drum", "Kick drum", "Female vocal \"Doo\"", "Acoustic guitar arpeggio" };
     for (int i = 0; i < 6; ++i) m.addItem(20 + i, names[i], true, processor.auditionMode() == i);
     m.addSeparator();
+    m.addItem(101, "Check for updates...");
     m.addItem(100, "About");
     juce::Component::SafePointer<NFPEAudioProcessorEditor> safe(this);
     m.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(&menuButton), [safe](int r)
@@ -647,6 +649,7 @@ void NFPEAudioProcessorEditor::showMainMenu()
             case 10: openManual(NFPEBinaryData::NF_ProcessorEffects_Manual_Portugues_pdf, NFPEBinaryData::NF_ProcessorEffects_Manual_Portugues_pdfSize, "NF_ProcessorEffects_Manual_Portugues_V" JucePlugin_VersionString ".pdf"); break;
             case 11: openManual(NFPEBinaryData::NF_ProcessorEffects_Manual_English_pdf, NFPEBinaryData::NF_ProcessorEffects_Manual_English_pdfSize, "NF_ProcessorEffects_Manual_English_V" JucePlugin_VersionString ".pdf"); break;
             case 100: safe->showAbout(); break;
+            case 101: safe->checkForUpdates(); break;
             default: if (r >= 20 && r < 26) pr.apvts.state.setProperty("auditionMode", r - 20, nullptr); break;
         }
     });
@@ -743,5 +746,36 @@ void NFPEAudioProcessorEditor::loadPresetFile()
             else juce::NativeMessageBox::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "NF Processor Effects", "Invalid NF Processor Effects preset");
         }
         safe->chooser.reset();
+    });
+}
+
+// Only runs when the user clicks the menu item: one request to the NF server, off the message thread.
+// The callback runs after the network round trip, so the editor may be gone by then (SafePointer).
+void NFPEAudioProcessorEditor::checkForUpdates()
+{
+    juce::Component::SafePointer<NFPEAudioProcessorEditor> safe(this);
+    nfupdate::checkAsync("nf-processor-effects", JucePlugin_VersionString, [safe](nfupdate::Result r)
+    {
+        if (safe == nullptr) return;
+        const juce::String title = "NF Processor Effects";
+
+        if (!r.reachedServer)
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title,
+                "Could not check for updates. Please check your internet connection and try again.");
+            return;
+        }
+        if (!r.updateAvailable)
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon, title,
+                juce::String("You have the latest version (V") + JucePlugin_VersionString + ").");
+            return;
+        }
+        const auto options = juce::MessageBoxOptions().withIconType(juce::MessageBoxIconType::InfoIcon).withTitle(title)
+            .withMessage("A new version is available: V" + r.latestVersion + " (you have V" + juce::String(JucePlugin_VersionString) + ").\n\nDownload it now?")
+            .withButton("Download").withButton("Later");
+        const auto url = r.downloadUrl;
+        // AlertWindow result codes with two buttons: first = 1, second = 0.
+        juce::AlertWindow::showAsync(options, [url](int button) { if (button == 1) juce::URL(url).launchInDefaultBrowser(); });
     });
 }
