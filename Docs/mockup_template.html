@@ -1,0 +1,80 @@
+<!doctype html><meta charset="utf-8"><title>NF Processor Effects - UI mockup</title>
+<body style="margin:0;background:#0b0c0e;display:flex;justify-content:center;align-items:center;min-height:100vh">
+<svg id="s" viewBox="0 0 1200 400" width="1200" xmlns="http://www.w3.org/2000/svg" style="display:block;max-width:100%"></svg>
+<script>
+(function(){
+var s=document.getElementById('s'),h='';
+var BLUE='#1d4f9f',DARK='#123a7a',LINE='#9fb8e6',W='#f2f6ff',G='#3fe06a',R='#ff4a3d';
+function T(x,y,t,sz,c,a,w,ls){h+='<text x="'+x+'" y="'+y+'" font-size="'+sz+'" fill="'+(c||W)+'" text-anchor="'+(a||'start')+'" font-weight="'+(w||500)+'" font-family="Arial,Helvetica,sans-serif" letter-spacing="'+(ls||0)+'">'+t+'</text>';}
+function Rc(x,y,w,hh,f,r,st,sw){h+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="'+(r||0)+'" fill="'+f+'"'+(st?' stroke="'+st+'" stroke-width="'+(sw||1.5)+'"':'')+'/>';}
+function L(x1,y1,x2,y2,c,w){h+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+(w||2)+'" stroke-linecap="round"/>';}
+function C(x,y,r,f,st,sw,op){h+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+f+'"'+(op?' fill-opacity="'+op+'"':'')+(st?' stroke="'+st+'" stroke-width="'+(sw||2)+'"':'')+'/>';}
+function knob(x,y,r,v){
+  for(var i=0;i<=10;i++){var a=(-135+27*i)*Math.PI/180;L(x+Math.sin(a)*(r+7),y-Math.cos(a)*(r+7),x+Math.sin(a)*(r+13),y-Math.cos(a)*(r+13),W,i%5==0?2.4:1.4);}
+  C(x,y,r+2,'#05070b');C(x,y,r,'#1b1e24','#3a3f49',2);C(x,y,r*0.72,'#262a32');
+  var a=(-135+270*v)*Math.PI/180;L(x+Math.sin(a)*r*0.25,y-Math.cos(a)*r*0.25,x+Math.sin(a)*r*0.92,y-Math.cos(a)*r*0.92,'#ffffff',3.6);
+}
+function btn(x,y,w,hh,t){Rc(x,y,w,hh,'#0d1118',5,'#556',1.5);Rc(x+3,y+3,w-6,hh-6,'#2a303b',3);T(x+w/2,y+hh/2+6,t,17,'#dfe6f5','middle',500);}
+function led(x,y,c,on){if(on)C(x,y,9,c,null,0,0.25);C(x,y,5.5,on?c:'#0b2250');}
+function seg(x,y,t){Rc(x,y,92,62,'#050806',6,'#223',2);T(x+46,y+49,t,54,G,'middle',500,3);}
+Rc(0,0,1200,400,BLUE,12);Rc(0,0,1200,6,'#6f95d6',0);Rc(0,394,1200,6,DARK,0);
+h+='<defs><radialGradient id="sg" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.45" stop-color="#b9c0c8"/><stop offset="1" stop-color="#6b737c"/></radialGradient><radialGradient id="sh" cx="50%" cy="50%" r="50%"><stop offset="0.6" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>';
+function screw(x,y,rot){
+ C(x+1.5,y+2.2,13,'url(#sh)');
+ C(x,y,10.5,'#3b4148');C(x,y,9.2,'url(#sg)');
+ C(x,y,9.2,'none','#4a5159',0.8);
+ h+='<g transform="rotate('+rot+' '+x+' '+y+')">';
+ h+='<path d="M'+(x-1.9)+' '+(y-6.6)+' h3.8 v4.7 h4.7 v3.8 h-4.7 v4.7 h-3.8 v-4.7 h-4.7 v-3.8 h4.7z" fill="#1d2126" opacity="0.95"/>';
+ h+='<path d="M'+(x-1.2)+' '+(y-5.6)+' h2.4 v4.5 h4.5 v2.4 h-4.5 v4.5 h-2.4 v-4.5 h-4.5 v-2.4 h4.5z" fill="#0b0d10" opacity="0.8"/>';
+ h+='<path d="M'+(x-5.9)+' '+(y+0.4)+' h3.9" stroke="#fff" stroke-opacity="0.35" stroke-width="0.8"/>';
+ h+='</g>';
+ C(x-3.2,y-4.2,2.4,'#fff',null,0,0.35);
+}
+screw(18,18,25);screw(1182,18,-35);screw(18,382,70);screw(1182,382,-10);
+h+='<image href="__LOGO__" x="26" y="4" width="96" height="53"/>';
+L(132,16,132,46,W,2);
+T(146,34,'NF PROCESSOR EFFECTS',26,W,'start',500,2);T(146,50,'DUAL REVERB / EFFECTS PROCESSOR',13,'#cfe0ff','start',500,2);
+Rc(858,14,233,31,'#07101f',9,'#0a0f14',2);T(974,36,'01  Big Pop Vocal',19,'#5fe0ff','middle',500);
+h+='<path d="M880 29 l10 -8 v16z M1070 21 l10 8 l-10 8z" fill="#5fe0ff"/>';
+[0,1,2].forEach(function(i){Rc(1120,18+i*9,30,3.6,W,2);});
+function sec(x,y,w,hh,t){Rc(x,y,w,hh,'none',8,LINE,1.6);Rc(x+12,y-11,t.length*11+16,22,BLUE,0);T(x+20,y+6,t,17,W,'start',500,2);}
+sec(18,66,326,168,'INPUT / ROUTING');
+for(var c=0;c<2;c++){for(var r=0;r<6;r++){led(40+c*20,208-r*18,r==5?R:(r>=3?'#ffd23f':G),r<(c?3:4));}}
+knob(122,158,28,.5);T(122,212,'INPUT',15,W,'middle');
+knob(204,158,24,.9);T(204,212,'MIX 1',15,W,'middle');
+knob(278,158,24,.9);T(278,212,'MIX 2',15,W,'middle');
+btn(238,92,86,32,'ROUTING');
+Rc(152,88,74,36,'#0b3a8a',4,LINE,1.2);
+h+='<path d="M162 99h12 M162 113h12 M174 96h16v6h-16z M174 110h16v6h-16z M190 99h8 M190 113h8" stroke="'+W+'" stroke-width="1.8" fill="none"/>';
+T(212,112,'2',16,W,'start',500);
+sec(358,66,520,168,'REVERB');
+T(640,76,'DELAY / EFFECTS',17,W,'start',500,2);
+var rv1=['Small Hall','Large Hall','Small Plate','Large Plate','Room','Chamber','Gated','Reverse'];
+var rv2=['Vocal Hall','Vocal Plate','Drum Hall','Drum Plate','Ambience','Studio','Arena','Spring'];
+var de1=['Studio Delay','Digital Delay','Tape Delay','Pong Delay','Mod Delay','Reverse Delay','De-Esser','Compressor'];
+var de2=['Chorus','Flanger','Phaser','Tremolo/Pan','Rotary','Vibrato','Pitch Shift','Detune'];
+[[372,rv1],[500,rv2],[652,de1],[778,de2]].forEach(function(c,ci){c[1].forEach(function(n,i){var y=104+i*17.5;
+ var p1=(ci==1&&i==0),p2=(ci==2&&i==2);
+ led(c[0]+6,y-5,G,p1);led(c[0]+22,y-5,R,p2);T(c[0]+34,y,n,15.5,(p1||p2)?'#ffffff':'#d6e3ff','start',(p1||p2)?500:400);});});
+L(630,84,630,226,LINE,1);
+sec(896,66,286,168,'PROGRAM');
+btn(912,84,72,30,'STORE');btn(994,84,84,30,'AUDITION');
+seg(918,128,'01');T(964,208,'USER PROGRAM',13,'#cfe0ff','middle');
+knob(1130,162,34,.12);T(1130,222,'PUSH TO LOAD',13,'#cfe0ff','middle');
+function proc(x,n,fx,col,labels,vals,pos,tempo){
+ sec(x,262,572,126,'PROCESSOR '+n);
+ Rc(x+16,278,46,92,'#0d1118',6,'#556',1.5);
+ h+='<path d="M'+(x+39)+' 292 l-11 14 h22z M'+(x+39)+' 356 l-11 -14 h22z" fill="'+W+'"/>';
+ T(x+39,330,'EFFECT',11.5,'#cfe0ff','middle');T(x+39,342,'SELECT',11.5,'#cfe0ff','middle');
+ Rc(x+76,276,150,30,'#07101f',6,'#0a0f14',2);led(x+90,291,col,true);T(x+104,298,fx,19,col==G?'#8cf0a4':'#ff9b92','start',500);
+ if(tempo){btn(x+76,316,70,28,'TEMPO');led(x+161,330,col,true);}
+ btn(x+(tempo?176:76),316,70,28,'BYPASS');
+ for(var i=0;i<3;i++){var kx=x+300+i*90;knob(kx,330,24,pos[i]);T(kx,372,labels[i],14,W,'middle');
+  Rc(kx-30,276,60,22,'#07101f',5,'#0a0f14',1.5);T(kx,293,vals[i],16,'#5fe0ff','middle');led(kx-34,342,'#ffb100',i==1&&n==2);}
+}
+proc(18,1,'Vocal Hall',G,['Pre delay','Decay','Liveliness'],['18 ms','55','60'],[.18,.55,.6],false);
+proc(610,2,'Tape Delay',R,['Time range','Feedback','Smear'],['36','42','30'],[.5,.42,.3],true);
+T(600,396,'NF AUDIO TOOLS',12,W,'middle');T(70,396,'V1.0.0',11,W,'start');
+s.innerHTML=h;
+})();
+</script>
